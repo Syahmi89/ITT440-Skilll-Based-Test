@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <time.h>
+#include <sys/socket.h>
+int main() {
+int client_addr_len = sizeof(client_addr);
+int length,cli,server;
+struct sockaddr_in server_addr, client_addr;
+int server_sock, client_sock, rand_num;
+// Create the server socket
+server_sock = socket(AF_INET, SOCK_STREAM, 0);
+// Configure the server address
+server_addr.sin_family = AF_INET;
+server_addr.sin_port = htons(8080);
+server_addr.sin_addr.s_addr = INADDR_ANY;
+// Bind the server socket to address
+bind(server_sock, (struct sockaddr *) &server_addr, sizeof(server_addr));
+// created socket creation
+if (server_sock == -1) {
+printf("SOCKET CREATED [FAILED]\n");
+exit(0);
+}
+else
+printf("SOCKET CREATED [SUCCESSFUL]\n");
+bzero(&server, sizeof(server));
+// Listened to the incoming connectivity
+if ((listen(server_sock, 5)) != 0) {
+printf("[LISTENING] failed.\n");
+exit(0);
+}
+3
+else
+printf("[LISTENING] from the client >>>\n");
+length = sizeof(cli);
+while (1) {
+// Accepted the incoming connectivity
+client_sock = accept(server_sock, (struct sockaddr *) &client_addr,
+&client_addr_len);
+if (client_sock < 0) {
+printf("[RECEIVING] The client message failed...\n");
+exit(0);
+}
+else
+printf("[RECEIVING] The client message.\n");
+// Generate the random number between 100 and 999
+srand(time(0));
+rand_num = rand() % 900 + 100;
+// send random number to client
+send(client_sock, &rand_num, sizeof(rand_num), 0);
+// close client socket
+close(client_sock);
+}
+// close server socket
+close(server_sock);
+return 0;
+}
