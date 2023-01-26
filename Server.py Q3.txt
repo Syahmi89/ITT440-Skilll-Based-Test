@@ -1,0 +1,41 @@
+Server side :
+
+import random
+import threading
+import socket
+
+#Array for the quotes
+quotes = ["We may achieve climate, but weather is thrust upon us. -O. Henry"
+,
+"Happy are those who dare courageously to defend what they love. —Ovid",
+"Happy are those who dare courageously to defend what they love. -Joseph addison"]
+
+
+def handle_client(sockfd):
+    quote = random.choice(quotes)
+    sockfd.sendall(quote.encode())
+    sockfd.close()
+
+def main():
+    #server ip and port
+    bind_ip = "192.168.31.138" 
+    bind_port = 8888
+
+    #Create and bind the socket
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind((bind_ip, bind_port))
+
+    #Listen from the client
+    server.listen(5)
+    print("[LISTENING] From client on >>>>>  %s:%d" % (bind_ip, bind_port))
+
+    #start connections and execute handle_client function
+    while True:
+        client, addr = server.accept()
+        print("[CONNECTION] Successful to connect %s" % str(addr))
+        client_handler = threading.Thread(target=handle_client, args=(client,))
+        client_handler.start()
+
+
+main()
